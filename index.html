@@ -2,156 +2,240 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>NewsPulse | 맞춤형 뉴스 리더</title>
-  <meta name="description" content="대북관계, 스포츠, 경제 등 원하는 주제를 선택하여 실시간 헤드라인을 맞춤형 카드로 읽고 모달로 본문을 탐색하는 스마트 뉴스 리더">
-  <!-- Google Fonts -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>NewsPulse v1.1.0 | 맞춤형 실시간 뉴스 리더</title>
+  <meta name="description" content="모바일 환경에 최적화된 고밀도 뉴스 리스트, 한 화면 10개 기사 탐색, 실시간 주제별 필터 및 상세 읽기 지원">
+  <!-- Google Fonts: Pretendard & Plus Jakarta Sans -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <!-- Header & Navigation Bar -->
-  <header class="app-header">
-    <div class="header-inner container">
-      <div class="brand-logo" id="brand-logo">
-        <span class="logo-icon">📰</span>
-        <div class="brand-text">
-          <h1>NewsPulse</h1>
-          <span class="brand-subtitle">맞춤형 실시간 뉴스 리더</span>
+  <!-- App Container (Mobile-first High Density Shell) -->
+  <div class="mobile-app-shell" id="app-shell">
+    
+    <!-- 1. Header Area -->
+    <header class="app-header" id="app-header">
+      <div class="header-main">
+        <div class="brand-group" id="btn-brand-home" title="첫 페이지로 이동">
+          <span class="brand-icon">📰</span>
+          <div class="brand-info">
+            <div class="brand-title-row">
+              <h1 class="brand-title">NewsPulse</h1>
+              <span class="version-tag">v1.1.0</span>
+            </div>
+            <span class="brand-subtitle">맞춤형 실시간 뉴스 리더</span>
+          </div>
+        </div>
+
+        <!-- Header Actions: Search, Refresh, Bookmarks, Multi-filter -->
+        <div class="header-actions">
+          <div class="status-indicator" id="status-indicator" title="데이터 갱신 상태">
+            <span class="status-dot"></span>
+            <span class="status-text" id="status-text">실시간</span>
+          </div>
+          <button type="button" class="icon-btn" id="btn-search-toggle" aria-label="기사 검색" title="검색">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+          </button>
+          <button type="button" class="icon-btn" id="btn-refresh" aria-label="뉴스 새로고침" title="새로고침">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.19"/></svg>
+          </button>
+          <button type="button" class="icon-btn" id="btn-topic-settings" aria-label="관심 주제 다중 설정" title="주제 설정">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="21" x2="4" y2="14"></line><line x1="4" y1="10" x2="4" y2="3"></line><line x1="12" y1="21" x2="12" y2="12"></line><line x1="12" y1="8" x2="12" y2="3"></line><line x1="20" y1="21" x2="20" y2="16"></line><line x1="20" y1="12" x2="20" y2="3"></line><line x1="1" y1="14" x2="7" y2="14"></line><line x1="9" y1="8" x2="15" y2="8"></line><line x1="17" y1="16" x2="23" y2="16"></line></svg>
+          </button>
         </div>
       </div>
-      <div class="header-status" id="header-status">
-        <span class="live-pulse"></span>
-        <span class="status-text">실시간 피드 준비됨</span>
+
+      <!-- Collapsible Search Bar -->
+      <div class="search-bar-row" id="search-bar-row" style="display: none;">
+        <div class="search-input-wrapper">
+          <span class="search-icon">🔍</span>
+          <input type="text" id="search-input" placeholder="뉴스 제목 또는 키워드 검색..." autocomplete="off">
+          <button type="button" class="search-clear-btn" id="btn-search-clear" aria-label="검색어 지우기">&times;</button>
+        </div>
+      </div>
+
+      <!-- 2. Category Tab Navigation (가로형 탭) -->
+      <nav class="category-nav" aria-label="뉴스 카테고리">
+        <div class="category-tabs" id="category-tabs">
+          <button type="button" class="cat-tab active" data-category="all">
+            <span class="tab-label">전체</span>
+          </button>
+          <button type="button" class="cat-tab" data-category="interkorean">
+            <span class="tab-label">대북관계</span>
+          </button>
+          <button type="button" class="cat-tab" data-category="sports">
+            <span class="tab-label">스포츠</span>
+          </button>
+          <button type="button" class="cat-tab" data-category="economy">
+            <span class="tab-label">경제</span>
+          </button>
+          <button type="button" class="cat-tab" data-category="bookmarks">
+            <span class="tab-label">북마크 <span class="bookmark-count-badge" id="bookmark-count">0</span></span>
+          </button>
+        </div>
+      </nav>
+    </header>
+
+    <!-- 3. Sub-header / Status Info Row -->
+    <div class="feed-info-bar" id="feed-info-bar">
+      <div class="feed-info-left">
+        <span class="feed-category-name" id="feed-category-name">전체 뉴스</span>
+        <span class="feed-divider">·</span>
+        <span class="feed-page-info" id="feed-page-info">1-10번 기사</span>
+      </div>
+      <div class="feed-info-right" id="feed-updated-time">
+        최근 갱신: 방금 전
       </div>
     </div>
-  </header>
 
-  <!-- Filter Controls Section -->
-  <section class="filter-section container" aria-label="뉴스 주제 필터">
-    <div class="filter-card">
-      <div class="filter-header">
-        <div>
-          <h2 class="filter-title">관심 주제를 선택하세요</h2>
-          <p class="filter-desc">원하는 주제를 복수 선택한 후 '뉴스 보기' 버튼을 눌러보세요.</p>
-        </div>
-        <div class="selection-counter" id="selection-counter">
-          선택된 주제: <span class="counter-badge" id="selected-count">3</span>개
-        </div>
+    <!-- 4. High-density News List (10개 한 화면 표시) -->
+    <main class="news-list-container" id="news-list-container">
+      <!-- Loading Skeleton (10 Rows) -->
+      <div class="list-skeleton-wrapper" id="list-skeleton" style="display: none;">
+        <div class="skeleton-row"></div>
+        <div class="skeleton-row"></div>
+        <div class="skeleton-row"></div>
+        <div class="skeleton-row"></div>
+        <div class="skeleton-row"></div>
+        <div class="skeleton-row"></div>
+        <div class="skeleton-row"></div>
+        <div class="skeleton-row"></div>
+        <div class="skeleton-row"></div>
+        <div class="skeleton-row"></div>
       </div>
 
-      <div class="topic-options-wrapper" id="topic-options-wrapper">
-        <!-- Topic 1: 대북관계 -->
-        <label class="topic-chip active" for="topic-interkorean" data-topic="interkorean">
-          <input type="checkbox" id="topic-interkorean" value="interkorean" checked>
-          <span class="chip-icon">🕊️</span>
-          <span class="chip-label">대북관계</span>
-          <span class="chip-check-icon">✓</span>
-        </label>
-
-        <!-- Topic 2: 스포츠 -->
-        <label class="topic-chip active" for="topic-sports" data-topic="sports">
-          <input type="checkbox" id="topic-sports" value="sports" checked>
-          <span class="chip-icon">⚽</span>
-          <span class="chip-label">스포츠</span>
-          <span class="chip-check-icon">✓</span>
-        </label>
-
-        <!-- Topic 3: 경제 -->
-        <label class="topic-chip active" for="topic-economy" data-topic="economy">
-          <input type="checkbox" id="topic-economy" value="economy" checked>
-          <span class="chip-icon">📈</span>
-          <span class="chip-label">경제</span>
-          <span class="chip-check-icon">✓</span>
-        </label>
+      <!-- Empty State -->
+      <div class="empty-state" id="empty-state" style="display: none;">
+        <div class="empty-icon">📰</div>
+        <h3 id="empty-title">표시할 뉴스가 없습니다</h3>
+        <p id="empty-desc">선택된 주제에 해당하는 기사가 없거나 검색 결과가 없습니다.</p>
+        <button type="button" class="btn btn-sm btn-primary" id="btn-empty-reset" style="margin-top: 12px;">전체 뉴스 보기</button>
       </div>
 
-      <div class="filter-actions">
-        <button type="button" class="btn btn-primary" id="btn-fetch-news">
-          <span class="btn-icon">⚡</span>
-          <span class="btn-text">뉴스 보기</span>
+      <!-- The 10 News Items List -->
+      <ul class="news-dense-list" id="news-dense-list" aria-label="최신 뉴스 목록">
+        <!-- Injected dynamically via app.js -->
+      </ul>
+    </main>
+
+    <!-- 5. Compact Pagination Controls -->
+    <footer class="pagination-footer" id="pagination-footer">
+      <button type="button" class="page-btn page-nav" id="btn-prev-page" disabled aria-label="이전 10개">
+        ‹ 이전
+      </button>
+      <div class="page-numbers" id="page-numbers">
+        <!-- Page buttons 1, 2, 3... -->
+      </div>
+      <button type="button" class="page-btn page-nav" id="btn-next-page" aria-label="다음 10개">
+        다음 10개 ›
+      </button>
+    </footer>
+
+    <!-- 6. Article Detail View (상세보기 전체화면 모드) -->
+    <section class="article-detail-view" id="article-detail-view" aria-hidden="true">
+      <div class="detail-header-bar">
+        <button type="button" class="detail-back-btn" id="btn-detail-back" aria-label="목록으로 돌아가기">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+          <span>목록으로</span>
         </button>
-      </div>
-    </div>
-  </section>
-
-  <!-- Feed Meta Bar -->
-  <section class="feed-summary container" id="feed-summary">
-    <div class="summary-left">
-      <h3 class="summary-title" id="summary-title">선택된 주제의 최신 헤드라인</h3>
-      <span class="summary-meta" id="summary-meta">로딩 중...</span>
-    </div>
-    <div class="summary-right">
-      <span class="topic-tag-list" id="active-tags-display"></span>
-    </div>
-  </section>
-
-  <!-- News Grid Container -->
-  <main class="feed-container container" id="main-content">
-    <!-- Empty State -->
-    <div class="empty-state" id="empty-state" style="display: none;">
-      <div class="empty-icon">🔍</div>
-      <h3>선택된 주제의 기사가 없습니다</h3>
-      <p>상단에서 하나 이상의 관심 주제를 선택한 후 <strong>'뉴스 보기'</strong>를 클릭해 주세요.</p>
-    </div>
-
-    <!-- News Cards Grid -->
-    <div class="news-grid" id="news-grid" aria-live="polite">
-      <!-- Dynamic news cards will be injected here -->
-    </div>
-
-    <!-- Infinite Scroll Sentinel & Loader -->
-    <div class="infinite-loader-wrapper" id="infinite-loader-wrapper">
-      <div class="loader-content" id="loader-content">
-        <div class="spinner" id="spinner"></div>
-        <p class="loader-text" id="loader-text">스크롤하여 다음 기사 10건 더 불러오는 중...</p>
-      </div>
-      <div class="end-of-feed" id="end-of-feed" style="display: none;">
-        <span>🎉 모든 기사를 확인했습니다.</span>
-      </div>
-    </div>
-    <div id="scroll-sentinel" class="scroll-sentinel" aria-hidden="true"></div>
-  </main>
-
-  <!-- Article Detail Modal -->
-  <div class="modal-backdrop" id="article-modal-backdrop" aria-hidden="true" role="dialog" aria-modal="true">
-    <div class="modal-dialog">
-      <div class="modal-header">
-        <div class="modal-meta-top">
-          <span class="modal-category" id="modal-category">주제</span>
-          <span class="modal-date" id="modal-date">발행일시</span>
-        </div>
-        <button type="button" class="modal-close-btn" id="modal-close-btn" aria-label="모달 닫기">
-          &times;
-        </button>
-      </div>
-      
-      <div class="modal-body">
-        <div class="modal-image-wrapper">
-          <img src="" alt="기사 대표 이미지" id="modal-image" class="modal-image" loading="lazy">
-        </div>
-        <h2 class="modal-title" id="modal-title">기사 제목</h2>
-        <div class="modal-publisher" id="modal-publisher">출처: 언론사</div>
-        <div class="modal-content" id="modal-content">
-          <!-- Article body text -->
+        <div class="detail-top-actions">
+          <button type="button" class="icon-btn-circle" id="btn-detail-bookmark" aria-label="북마크 저장" title="북마크">
+            <svg class="bookmark-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path></svg>
+          </button>
+          <button type="button" class="icon-btn-circle" id="btn-detail-share" aria-label="기사 공유하기" title="공유하기">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
+          </button>
         </div>
       </div>
 
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" id="modal-btn-close">닫기</button>
-        <a href="#" target="_blank" rel="noopener noreferrer" class="btn btn-primary" id="modal-link-original">
-          원문 기사 보러가기 ↗
-        </a>
+      <div class="detail-scroll-body">
+        <div class="detail-category-row">
+          <span class="detail-category-badge" id="detail-category">카테고리</span>
+          <span class="detail-publisher" id="detail-publisher">언론사</span>
+        </div>
+
+        <h2 class="detail-title" id="detail-title">기사 전체 제목</h2>
+        
+        <div class="detail-time-row">
+          <span class="detail-date" id="detail-date">2026.10.17 10:30 KST</span>
+        </div>
+
+        <div class="detail-media-container" id="detail-media-container">
+          <img src="" alt="기사 대표 이미지" id="detail-image" class="detail-image" loading="lazy">
+        </div>
+
+        <div class="detail-content-area" id="detail-content">
+          <!-- 기사 본문 요약 내용 -->
+        </div>
+
+        <div class="detail-copyright-notice">
+          ℹ️ 본 서비스는 언론사 저작권을 준수하며, 기사 전문 및 고화질 원문은 아래 원문 읽기 링크를 통해 해당 언론사 페이지에서 제공됩니다.
+        </div>
+
+        <div class="detail-action-footer">
+          <a href="#" target="_blank" rel="noopener noreferrer" class="btn btn-primary btn-block" id="btn-detail-original">
+            원문 기사 읽기 ↗
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- 7. Multi-topic Settings Modal -->
+    <div class="modal-backdrop" id="topic-modal-backdrop" aria-hidden="true" role="dialog" aria-modal="true">
+      <div class="modal-dialog-bottom">
+        <div class="modal-handle-bar"></div>
+        <div class="modal-header">
+          <h3 class="modal-title">관심 뉴스 주제 설정</h3>
+          <button type="button" class="modal-close-icon" id="btn-topic-modal-close" aria-label="닫기">&times;</button>
+        </div>
+        <p class="modal-desc">피드에 포함할 주제를 복수 선택하세요. (설정은 브라우저에 저장됩니다)</p>
+
+        <div class="topic-checklist" id="topic-checklist">
+          <label class="topic-check-item" for="chk-interkorean">
+            <input type="checkbox" id="chk-interkorean" value="interkorean" checked>
+            <span class="check-box-icon"></span>
+            <span class="check-item-icon">🕊️</span>
+            <div class="check-item-text">
+              <strong>대북관계</strong>
+              <small>남북 회담, 비핵화, DMZ, 외교 안보</small>
+            </div>
+          </label>
+
+          <label class="topic-check-item" for="chk-sports">
+            <input type="checkbox" id="chk-sports" value="sports" checked>
+            <span class="check-box-icon"></span>
+            <span class="check-item-icon">⚽</span>
+            <div class="check-item-text">
+              <strong>스포츠</strong>
+              <small>손흥민, KBO 야구, 해외축구, 올림픽</small>
+            </div>
+          </label>
+
+          <label class="topic-check-item" for="chk-economy">
+            <input type="checkbox" id="chk-economy" value="economy" checked>
+            <span class="check-box-icon"></span>
+            <span class="check-item-icon">📈</span>
+            <div class="check-item-text">
+              <strong>경제</strong>
+              <small>코스피, 금리, 환율, 반도체, 부동산</small>
+            </div>
+          </label>
+        </div>
+
+        <div class="modal-actions">
+          <button type="button" class="btn btn-primary btn-block" id="btn-save-topic-settings">설정 저장 및 새로고침</button>
+        </div>
       </div>
     </div>
+
+    <!-- 8. Toast Notification -->
+    <div class="toast-container" id="toast-container" aria-live="polite"></div>
+
   </div>
 
-  <!-- Toast Notification -->
-  <div class="toast-container" id="toast-container" aria-live="polite"></div>
-
-  <!-- Script -->
+  <!-- JavaScript -->
   <script src="app.js"></script>
 </body>
 </html>
